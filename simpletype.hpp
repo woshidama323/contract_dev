@@ -16,7 +16,7 @@ namespace simple{
         uint64_t  platform_commission;
         uint64_t autoclose;
         //std::string text;
-        name textname;
+        //name textname;
         
         };
 }
