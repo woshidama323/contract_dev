@@ -1,6 +1,8 @@
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/asset.hpp>
 #include <string>
 using namespace eosio;
+using eosio::asset;
 
 
 namespace simple{
@@ -15,6 +17,7 @@ namespace simple{
         uint64_t  lend_uint64_terest;
         uint64_t  platform_commission;
         uint64_t autoclose;
+        //asset quantity;
         //std::string text;
         //name textname;
         

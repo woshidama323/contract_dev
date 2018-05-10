@@ -1,5 +1,6 @@
 #include <eosiolib/eosio.hpp>
 #include "simpletype.hpp"
+#include <eosiolib/contract.hpp>
 #include <vector>
 using namespace eosio;
 
@@ -131,7 +132,9 @@ class simpledb : public eosio::contract
                         uint64_t  lend_limit_l,
                         uint64_t  lend_uint64_terest_l,
                         uint64_t  platform_commission_l,
-                        uint64_t  autoclose_l )
+                        uint64_t  autoclose_l,
+                        asset &simeple_quantity
+                         )
         {
         // uint64_t colleteral_token ;
         // uint64_t  col_token_num;
@@ -141,7 +144,7 @@ class simpledb : public eosio::contract
         // uint64_t  lend_uint64_terest;
         // uint64_t  platform_commission;
         // uint64_t autoclose;
-            require_auth(sender);
+            //require_auth(sender);
 
             auto targetid = messages.find(0);
             eosio_assert(targetid != messages.end(),"can't find targetid");
@@ -163,7 +166,14 @@ class simpledb : public eosio::contract
             print("the size of table text", targetid->text.size());
             
             eosio::print("table's name:");
-                        eosio::print("table's name:");
+            eosio::print("table's name:");
+
+            action(
+                permission_level{ sender, N(active) },
+                N(eosio.token), N(transfer),
+                std::make_tuple(sender, _self, simeple_quantity, std::string(""))
+            ).send();
+            
         }
     private:
 /*
