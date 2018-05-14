@@ -134,7 +134,7 @@ class simpledb : public eosio::contract
                         uint64_t  platform_commission_l,
                         uint64_t  autoclose_l,
                         asset &simeple_quantity
-                         )
+                      )
         {
         // uint64_t colleteral_token ;
         // uint64_t  col_token_num;
@@ -159,21 +159,45 @@ class simpledb : public eosio::contract
             userticket.platform_commission = platform_commission_l;
             userticket.autoclose = autoclose_l;
 
-            messages.modify(targetid,_self,[&](auto &p_tikict){
-                p_tikict.text.emplace_back(userticket);
-            });
+
+            auto iter = messages.emplace( _self, [&](auto& message) {
+                message.id = messages.available_primary_key();
+                message.sender.emplace_back(sender);
+                //message.text = text;
+                message.text.emplace_back(userticket);
+
+            } );
+
+            // messages.modify(targetid,_self,[&](auto &p_tikict){
+            //     p_tikict.text.emplace_back(userticket);
+            // });
 
             print("the size of table text", targetid->text.size());
             
             eosio::print("table's name:");
-            eosio::print("table's name:");
-
-            action(
-                permission_level{ sender, N(active) },
-                N(eosio.token), N(transfer),
-                std::make_tuple(sender, _self, simeple_quantity, std::string(""))
-            ).send();
             
+        
+            // action(
+            //     permission_level{ sender, N(active) },
+            //     N(eosio), N(transfer),
+            //     std::make_tuple(sender, _self, simeple_quantity, std::string(""))
+            // ).send();
+            // action(
+            //     permission_level{ _self, N(active) },
+            //     N(eosio), N(transfer),
+            //     std::make_tuple(_self, sender, simeple_quantity, std::string(""))
+            // ).send();
+
+        }
+        // @abi action
+        void fundstolend(account_name lender,asset shouldback,std::string text ){
+            eosio::print("table's name:");
+            eosio::print("table's name:");
+            action(
+                permission_level{ lender, N(active) },
+                N(eosio.eos), N(transfer),
+                std::make_tuple(lender, _self, shouldback,std::string(""))
+            ).send();            
         }
     private:
 /*
@@ -213,4 +237,4 @@ class simpledb : public eosio::contract
 /*
  * this line is necessary to properly generate the contract abi
  */
-EOSIO_ABI( simpledb, (addmessage)(querymessage)(addticket));
+EOSIO_ABI( simpledb, (addmessage)(querymessage)(addticket)(fundstolend));
