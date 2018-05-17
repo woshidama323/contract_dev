@@ -190,13 +190,27 @@ class simpledb : public eosio::contract
 
         }
         // @abi action
-        void fundstolend(account_name lender,asset shouldback,std::string text ){
+        void borrow2contr(account_name borrower,account_name lender,asset shouldback,std::string text ){
             eosio::print("table's name:");
+
+            // action(
+            //     permission_level{ borrower, N(active) },
+            //     N(eosio.eos), N(transfer),
+            //     std::make_tuple(borrower, _self, shouldback,std::string(""))
+            // ).send();     
+
+            
+            contr2lend(lender,shouldback,text);       
+        }
+
+        // @abi action
+        void contr2lend(account_name lender,asset shouldback,std::string text ){
             eosio::print("table's name:");
+            
             action(
-                permission_level{ lender, N(active) },
+                permission_level{ _self, N(active) },
                 N(eosio.eos), N(transfer),
-                std::make_tuple(lender, _self, shouldback,std::string(""))
+                std::make_tuple(_self, lender, shouldback,std::string(""))
             ).send();            
         }
     private:
@@ -237,4 +251,4 @@ class simpledb : public eosio::contract
 /*
  * this line is necessary to properly generate the contract abi
  */
-EOSIO_ABI( simpledb, (addmessage)(querymessage)(addticket)(fundstolend));
+EOSIO_ABI( simpledb, (addmessage)(querymessage)(addticket)(borrow2contr)(contr2lend));

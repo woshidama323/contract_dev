@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 
    rm -rf /Users/easylend/Library/Application\ Support/eosio/nodeos/data/./default.wallet
