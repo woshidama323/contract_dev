@@ -31,24 +31,6 @@ class elcontract : public eosio::contract
  * for correct generation of the contract abi, we need to mark it for the interpreter
  * thus the use of "// @abi action"
  */
-        // @abi action
-        void addmessage( account_name sender, std::string text )
-        {
-/*
- * require_auth is self explanatory, a user can only be considered "sender" if
- * he has authority
- */
-            require_auth(sender);
-
-        }
-
-        // @abi action
-        void querymessage( account_name sender, std::string text )
-        {
-
-            require_auth(sender);
-            
-        }
 
         // @abi action
         void addticket( 
@@ -79,8 +61,6 @@ class elcontract : public eosio::contract
             } );
             eosio::print("what is iterator ", iter->ticketid); 
             eosio::print("table's name: test --------------------");
-            
-
         }
 
         void changeticket(
@@ -99,9 +79,11 @@ class elcontract : public eosio::contract
             msgtable.modify(it,_self,[&](auto & p){
                 if( lender != 0)
                     p.lender = lender;
-                p.loanstat = "waiting";
+                if( loanstat == "")
+                    p.loanstat = "waiting";
+                else
+                    p.loanstat = loanstat;
             });
-
         }
 
         // @abi action
@@ -133,15 +115,17 @@ class elcontract : public eosio::contract
         }
 
         // @abi action
+        //do this action when the contract is finished.
         void contr2lend(account_name lender,asset shouldback,std::string text ){
             
             action(
                 permission_level{ _self, N(active) },
-                N(eosio.eos), N(transfer),
+                N(eosio.token), N(transfer),
                 std::make_tuple(_self, lender, shouldback,std::string(""))
             ).send();
         }
 
+        // @abi action
         void resettable()
         {
             msg msgtable(_self,_self);
@@ -155,6 +139,7 @@ class elcontract : public eosio::contract
             }
         }
 
+        // @abi action
         void finishloan(){
             msg msgtable(_self,_self);
             auto it = msgtable.begin();
@@ -165,7 +150,22 @@ class elcontract : public eosio::contract
             }
         }
 
-        
+        //only the ticket which marked with "waiting" would be checked.
+        // @abi action
+        void chlefttime (uint64_t ticketid)
+        {
+            msg msgtable(_self,_self);
+            auto it = msgtable.find(ticketid);
+
+            msgtable.modify(it,_self,[&](auto & p){
+                p.timeleft--;
+                eosio::print("left time is :",p.timeleft);
+                if(it->timeleft == 0)
+                    p.loanstat = "finish";
+            });
+
+        }
+
     private:
 /*
  * this is the struct defining the actual table in the chain database,
@@ -217,4 +217,4 @@ class elcontract : public eosio::contract
 /*
  * this line is necessary to properly generate the contract abi
  */
-EOSIO_ABI( elcontract, (addmessage)(querymessage)(addticket)(borrow2contr)(contr2lend)(resettable)(changeticket)(finishloan));
+EOSIO_ABI( elcontract, (addticket)(borrow2contr)(contr2lend)(resettable)(changeticket)(finishloan)(chlefttime));
