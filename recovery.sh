@@ -2,6 +2,7 @@
 
 
    rm -rf /Users/easylend/Library/Application\ Support/eosio/nodeos/data/./default.wallet
+   rm -rf /Users/easylend/eosio-wallet/./default.wallet
 
 
 date >>log
